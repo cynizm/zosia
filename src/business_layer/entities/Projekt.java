@@ -4,6 +4,9 @@ package business_layer.entities;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class Projekt {
 
@@ -11,6 +14,7 @@ public class Projekt {
     private ArrayList<Ryzyko> ryzyka = new ArrayList<>();
     private ArrayList<Stan> stany = new ArrayList<>();
     private ArrayList<Osoba> zespol = new ArrayList<>();
+    private List<Zadanie> zadania = new ArrayList<>();
     
     private String nazwa;
     private int status;
@@ -18,8 +22,12 @@ public class Projekt {
     private Date data_rozpoczecia;
     private Date data_zakonczenia;
     private Osoba kierownik;
+    private TypProjektu typ;
+    private final Map <Rola,Integer> stanRol = new HashMap <>();
+    private final Map <TypProjektu, Map<Rola,Integer>> limitRol;
         
     public Projekt(){
+        this.limitRol = new HashMap <>();
         nazwa = "";
         status = 0;
         klient = null;
@@ -29,6 +37,28 @@ public class Projekt {
         ryzyka = new ArrayList();
         stany = new ArrayList();
         zespol = new ArrayList();
+        
+         Map<Rola,Integer> mapaMaly = new HashMap<>();
+        mapaMaly.put(Rola.TESTER, 1);
+        mapaMaly.put(Rola.ANALITYK, 1);
+        mapaMaly.put(Rola.KIEROWNIK_PROJEKTU, 1);
+        mapaMaly.put(Rola.PROGRAMISTA, 1);
+
+        Map<Rola,Integer> mapaDuzy = new HashMap<>();
+        mapaDuzy.put(Rola.TESTER, 3);
+        mapaDuzy.put(Rola.ANALITYK, 3);
+        mapaDuzy.put(Rola.KIEROWNIK_PROJEKTU, 3);
+        mapaDuzy.put(Rola.PROGRAMISTA, 3);
+
+        limitRol.put(TypProjektu.DUZY, mapaDuzy);
+        limitRol.put(TypProjektu.MALY, mapaMaly);
+
+        stanRol.put(Rola.TESTER, 0);
+        stanRol.put(Rola.ANALITYK, 0);
+        stanRol.put(Rola.KIEROWNIK_PROJEKTU, 0);
+        stanRol.put(Rola.PROGRAMISTA, 0);
+        
+        typ = TypProjektu.MALY;
     }    
     
     
@@ -82,6 +112,14 @@ public class Projekt {
     }
     public void setStan(Stan stan){
        stany.add(stan);
+    }
+    
+    public List<Zadanie> getZadania() {
+        return zadania;
+    }
+
+    public void setZadania(List<Zadanie> zadania) {
+        this.zadania = zadania;
     }
     
     
@@ -143,6 +181,53 @@ public class Projekt {
 
     public ArrayList<Ryzyko> getRyzyka() {
         return ryzyka;
+    }
+    
+    public int limitRoli(Rola rola){
+        return limitRol.get(typ).get(rola);
+    }
+
+    public int stanRoli(Rola rola){
+        return stanRol.get(rola);
+    }
+
+    public boolean zarezerwujRole(Rola rola){
+        int stan = stanRol.get(rola);
+        int limit = limitRol.get(typ).get(rola);
+        if (stan<limit) {
+            stanRol.replace(rola, stan+1);
+            return true;
+        } else
+            return false;
+    }
+
+    public String dodajOsobe(Osoba osoba) {
+       Projekt p1 = osoba.getProjekt();
+       if (p1 == null) {
+           Rola r1 = osoba.getRola();
+           if (zarezerwujRole(r1)){
+               osoba.setProjekt(this);
+               zespol.add(osoba);
+               return "Dodano osobę do projektu.";
+           } else
+               return "Osiągnięto limit danej roli!";
+       } else
+          return "Osoba ma już przydzielony projekt!";
+    }
+
+    public Zadanie szukajZadanie(Zadanie zadanie) {
+        int idx = zadania.indexOf(zadanie);
+        if (idx != -1)
+            return zadania.get(idx);
+        return null;
+    }
+
+    public String dodajZadanie(Zadanie zadanie) {
+        if (szukajZadanie(zadanie) == null) {
+            zadania.add(zadanie);
+            return "Dodano zadanie do projektu.";
+        } else
+            return "Zadanie znajduje się już na liście zadań projektu!";
     }
 
 }

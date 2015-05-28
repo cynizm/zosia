@@ -5,6 +5,8 @@ import business_layer.entities.Osoba;
 import business_layer.entities.Rola;
 import business_layer.entities.Ryzyko;
 import business_layer.entities.Projekt;
+import business_layer.entities.StatusZadania;
+import business_layer.entities.Zadanie;
 import java.util.Date;
 
 public class Factory {
@@ -85,5 +87,17 @@ public Factory() {
         kierownik.setEmail(emailKierownika);
         projekt.setKierownik(kierownik);
         return projekt;
+    }
+        
+        public Zadanie createZadanie(String[] data){
+        Zadanie zad = new Zadanie();
+        zad.setIdentyfikator(Integer.parseInt(data[0]));
+        zad.setNazwa((String)data[1]);
+        zad.setStatus(StatusZadania.fromString(data[2]));
+        zad.setSzacowanyCzas(Integer.parseInt(data[3]));
+        zad.setCzasDoZakonczenia(Integer.parseInt(data[4]));
+        zad.setCzasRealizacji(Integer.parseInt(data[5]));
+        zad.setOsoba(null); //data[6]
+        return zad;
     }
 }

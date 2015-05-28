@@ -5,13 +5,17 @@ import business_layer.entities.Osoba;
 import business_layer.entities.Projekt;
 import business_layer.entities.Rola;
 import business_layer.entities.Ryzyko;
+import business_layer.entities.StatusZadania;
+import business_layer.entities.Zadanie;
 import java.util.ArrayList;
+import java.util.List;
 
 public class Fasada {
 
     private ArrayList<Klient> klienci = new ArrayList<>();
     private ArrayList<Osoba> osoby = new ArrayList<>();
     private ArrayList<Projekt> projekty = new ArrayList<>();
+    private final List<Zadanie> zadania = new ArrayList<>();
 
     public Fasada() {
         //tymczasowo dodajemy projekt
@@ -66,6 +70,47 @@ public class Fasada {
             //projekt[i++] = next.toString_();
         }
         return tablica_projektow;
+    }
+    
+    public synchronized Object[][] modelTablicaZDanymiZadan(String kierownikProjektu) {
+        Projekt p = szukajProjektPoKierowniku(kierownikProjektu);
+        if (p != null) {
+            List<Zadanie> lista = p.getZadania();
+            Object[][] tablicaZadan = new Object[lista.size()][];
+            int i = 0;
+            for (Zadanie next : lista) {
+                String[] daneZadania = new String[7];
+                daneZadania[0] = Integer.toString(next.getIdentyfikator());
+                daneZadania[1] = next.getNazwa();
+                daneZadania[2] = next.getStatus().getText();
+                daneZadania[3] = Integer.toString(next.getSzacowanyCzas());
+                daneZadania[4] = Integer.toString(next.getCzasDoZakonczenia());
+                daneZadania[5] = Integer.toString(next.getCzasRealizacji());
+                daneZadania[6] = "Nie przydzielono";
+                tablicaZadan[i++] = daneZadania;
+            }
+            return tablicaZadan;
+        }
+        return new Object[0][0];
+    }
+    
+    public synchronized Object[][] modelTablicaZDanymiZespolu(String kierownikProjektu) {        
+        Projekt p = szukajProjektPoKierowniku(kierownikProjektu);
+        if (p != null) {
+            List<Osoba> lista = p.getZespol();
+            Object[][] tablicaOsob = new Object[lista.size()][];
+            int i = 0;
+            for (Osoba next : lista) {
+                String[] daneOsoby = new String[7];
+                daneOsoby[0] = next.getImie();
+                daneOsoby[1] = next.getNazwisko();
+                daneOsoby[2] = next.getEmail();
+                daneOsoby[3] = next.getRola().getText();
+                tablicaOsob[i++] = daneOsoby;
+            }
+            return tablicaOsob;
+        }
+        return new Object[0][0];
     }
 
     public synchronized Projekt searchProjekt(Projekt projekt) {
@@ -165,6 +210,14 @@ public class Fasada {
         }
         return null;
     }
+    
+    protected Osoba szukajOsobe(String email) {
+        int ile = osoby.size();
+        for(int i=0; i<ile; i++)
+            if(osoby.get(i).getEmail().equals(email))
+                return osoby.get(i);
+        return null;
+    }
 
     public synchronized Object dodajOsobe(String data[]) {
         Factory factory = new Factory();
@@ -174,6 +227,25 @@ public class Fasada {
             return nowa_osoba;
         }
         return null;
+    }
+    
+    public String dodajOsobeDoProjektu(String kierownikProjektu, String dodawanaOsoba) {
+        Projekt p = szukajProjektPoKierowniku(kierownikProjektu);
+        if (p == null)
+            return "Projekt nie istnieje!";
+        else {
+            try {
+                String[] osoba = {"0", dodawanaOsoba};
+                Factory fabryka = new Factory();
+                Osoba o = szukajOsobe(fabryka.createOsoba(osoba));
+                if (o != null)
+                    return p.dodajOsobe(o);
+                else
+                    return "Osoba nie istnieje w systemie!";
+            } catch (Exception e) {
+                return "Nie można przypisać osoby! " + e.getMessage();
+            }
+        }
     }
 
     private Osoba szukajKierownika(String email) {
@@ -201,6 +273,14 @@ public class Fasada {
             nazwy_rol[i] = role[i].getText();
         }
         return nazwy_rol;
+    }
+    
+     public synchronized String[] modelStatusyZadan() {
+        StatusZadania[] statusy = StatusZadania.values();
+        String[] nazwyStatusow = new String[statusy.length];
+        for (int i = 0; i < statusy.length; i++) 
+            nazwyStatusow[i] = statusy[i].getText();
+        return nazwyStatusow;
     }
 
     public synchronized void wyswietlOsoby() {
@@ -297,6 +377,38 @@ public class Fasada {
                 .filter((osoba) -> (osoba.getRola() == Rola.KIEROWNIK_PROJEKTU))
                 .forEach((osoba) -> tablica.add(osoba.getEmail()));
         return tablica.toArray();
+    }
+    
+     protected Zadanie szukajZadanie(String id) {
+        int ile = zadania.size();
+        for (int i=0; i<ile; i++)
+            if (String.valueOf(zadania.get(i).getIdentyfikator()).equals(id))
+                return zadania.get(i);
+        return null;
+    }
+     
+     public String dodajZadanieDoProjektu(String kierownikProjektu, String[] zadanie) {
+        Projekt p = szukajProjektPoKierowniku(kierownikProjektu);
+        if (p == null)
+            return "Projekt nie istnieje!";
+        else {
+            try {
+                Factory fabryka = new Factory();
+                Zadanie z = fabryka.createZadanie(zadanie);
+                return p.dodajZadanie(z);
+            } catch (Exception e) {
+                return "Nie można utworzyć zadania! " + e.getMessage();
+            }
+        }
+    }
+     
+     protected Projekt szukajProjektPoKierowniku(String kierownikProjektu) {
+        Factory fabryka = new Factory();
+        Osoba kierownik = szukajKierownika(kierownikProjektu);
+        String[] data = {"","0"};
+        Projekt temp = fabryka.createProjekt(data);
+        temp.setKierownik(kierownik);
+        return this.searchProjekt(temp);
     }
     
      public Object[] pobierzTabliceKlientow() {
