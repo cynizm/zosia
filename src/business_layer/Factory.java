@@ -1,5 +1,5 @@
 package business_layer;
-
+//test
 import business_layer.entities.Klient;
 import business_layer.entities.Osoba;
 import business_layer.entities.Rola;
