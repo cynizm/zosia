@@ -95,16 +95,4 @@ public class Klient {
         return val;
     }
     
-        public String[] toStringArray() {
-        String[] client = new String[7];
-        client[0]=getNazwaFirmy();
-        client[1]=getNip();
-        client[2]=getUlica();
-        client[3]=getNrDomu();
-        client[4]=getNrLokalu();
-        client[5]=getKodPocztowy();
-        client[6]=getMiejscowosc();
-        return client;
-    }
-    
 }

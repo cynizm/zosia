@@ -5,8 +5,10 @@ import business_layer.entities.Osoba;
 import business_layer.entities.Rola;
 import business_layer.entities.Ryzyko;
 import business_layer.entities.Projekt;
-import business_layer.entities.StatusZadania;
-import business_layer.entities.Zadanie;
+import business_layer.entities.Sprint;
+import business_layer.entities.StanSprintu;
+import business_layer.entities.StatusSprintu;
+
 import java.util.Date;
 
 public class Factory {
@@ -61,7 +63,8 @@ public Factory() {
                 nowa_osoba.setImie(data[1]);
                 nowa_osoba.setNazwisko(data[2]);
                 nowa_osoba.setEmail(data[3]);
-                nowa_osoba.setRola(Rola.fromString(data[4]));
+                nowa_osoba.setIdProjektu(Integer.parseInt(data[4]));
+                nowa_osoba.setRola(Rola.fromString(data[5]));
                 break;
         }
         return nowa_osoba;
@@ -75,29 +78,24 @@ public Factory() {
         return projekt;
     }
     
-        public Klient createKlient(String NIP) {
-        Klient klient = new Klient();
-        klient.setNip(NIP);      
-        return klient;
+    public Sprint createSprint(String[] data){
+        Sprint sprint = new Sprint();
+        sprint.setNumerSprintu(Integer.parseInt(data[0]));
+        sprint.setDataRozpoczecia(new Date());
+        sprint.setDataZakonczenia(new Date());
+        sprint.zmienStatusSprintu(StatusSprintu.fromString(data[1]));
+        return sprint;
     }
-        
-        public Projekt createProjekt(String emailKierownika){
-        Projekt projekt = new Projekt();
-        Osoba kierownik = new Osoba();
-        kierownik.setEmail(emailKierownika);
-        projekt.setKierownik(kierownik);
-        return projekt;
-    }
-        
-        public Zadanie createZadanie(String[] data){
-        Zadanie zad = new Zadanie();
-        zad.setIdentyfikator(Integer.parseInt(data[0]));
-        zad.setNazwa((String)data[1]);
-        zad.setStatus(StatusZadania.fromString(data[2]));
-        zad.setSzacowanyCzas(Integer.parseInt(data[3]));
-        zad.setCzasDoZakonczenia(Integer.parseInt(data[4]));
-        zad.setCzasRealizacji(Integer.parseInt(data[5]));
-        zad.setOsoba(null); //data[6]
-        return zad;
+    
+    public StanSprintu createStanSprintu(String[] data){
+        StanSprintu stan_sprintu = new StanSprintu();
+        stan_sprintu.setDataAktualizacji( new Date());
+        stan_sprintu.setNumerDniaSprintu(Integer.parseInt(data[0]));
+        stan_sprintu.setIloscZadanNierozpoczetych(Integer.parseInt(data[1]));
+        stan_sprintu.setIloscZadanWAnalizie(Integer.parseInt(data[2]));
+        stan_sprintu.setIloscZadanWImplementacji(Integer.parseInt(data[3]));
+        stan_sprintu.setIloscZadanWTestach(Integer.parseInt(data[4]));
+        stan_sprintu.setIloscZadanZakonczonych(Integer.parseInt(data[5]));
+        return stan_sprintu;
     }
 }
