@@ -5,6 +5,9 @@ import business_layer.entities.Osoba;
 import business_layer.entities.Rola;
 import business_layer.entities.Ryzyko;
 import business_layer.entities.Projekt;
+import business_layer.entities.Sprint;
+import business_layer.entities.StanSprintu;
+import business_layer.entities.StatusSprintu;
 import business_layer.entities.StatusZadania;
 import business_layer.entities.Zadanie;
 import java.util.Date;
@@ -99,5 +102,27 @@ public Factory() {
         zad.setCzasRealizacji(Integer.parseInt(data[5]));
         zad.setOsoba(null); //data[6]
         return zad;
+    }
+        
+            
+    public Sprint createSprint(String[] data){
+        Sprint sprint = new Sprint();
+        sprint.setNumerSprintu(Integer.parseInt(data[0]));
+        sprint.setDataRozpoczecia(new Date());
+        sprint.setDataZakonczenia(new Date());
+        sprint.zmienStatusSprintu(StatusSprintu.fromString(data[1]));
+        return sprint;
+    }
+    
+    public StanSprintu createStanSprintu(String[] data){
+        StanSprintu stan_sprintu = new StanSprintu();
+        stan_sprintu.setDataAktualizacji( new Date());
+        stan_sprintu.setNumerDniaSprintu(Integer.parseInt(data[0]));
+        stan_sprintu.setIloscZadanNierozpoczetych(Integer.parseInt(data[1]));
+        stan_sprintu.setIloscZadanWAnalizie(Integer.parseInt(data[2]));
+        stan_sprintu.setIloscZadanWImplementacji(Integer.parseInt(data[3]));
+        stan_sprintu.setIloscZadanWTestach(Integer.parseInt(data[4]));
+        stan_sprintu.setIloscZadanZakonczonych(Integer.parseInt(data[5]));
+        return stan_sprintu;
     }
 }

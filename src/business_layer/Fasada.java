@@ -5,6 +5,9 @@ import business_layer.entities.Osoba;
 import business_layer.entities.Projekt;
 import business_layer.entities.Rola;
 import business_layer.entities.Ryzyko;
+import business_layer.entities.Sprint;
+import business_layer.entities.StanSprintu;
+import business_layer.entities.StatusSprintu;
 import business_layer.entities.StatusZadania;
 import business_layer.entities.Zadanie;
 import java.util.ArrayList;
@@ -193,7 +196,27 @@ public class Fasada {
         }
         return matrix;
     }
-
+    
+    public synchronized String[] modelStatusSprintu() {
+        StatusSprintu [] status = StatusSprintu.values();
+        String[] nazwy_statusow = new String[status.length];
+        for (int i = 0; i < status.length; i++) {
+            nazwy_statusow[i] = status[i].getText();
+        }
+        return nazwy_statusow;
+    }
+        
+        
+    public synchronized void wyswietlOsoby() {
+        Object[][] help_list = modelTablicaZDanymiOsob();
+        for (Object[] rekord : help_list) {
+            for (int j = 0; j < 5; j++) {
+                System.out.print(rekord[j] + " ");
+            }
+            System.out.println();
+        }
+    }
+    
     public synchronized Osoba szukajOsobe(Osoba osoba) {
         int idx = osoby.indexOf(osoba);
         if (idx != -1) {
@@ -281,16 +304,6 @@ public class Fasada {
         for (int i = 0; i < statusy.length; i++) 
             nazwyStatusow[i] = statusy[i].getText();
         return nazwyStatusow;
-    }
-
-    public synchronized void wyswietlOsoby() {
-        Object[][] help_list = modelTablicaZDanymiOsob();
-        for (Object[] rekord : help_list) {
-            for (int j = 0; j < 5; j++) {
-                System.out.print(rekord[j] + " ");
-            }
-            System.out.println();
-        }
     }
 
     public synchronized String[] dodajKlienta(String data[]) {
@@ -427,6 +440,117 @@ public class Fasada {
         return tablica.toArray();
     }
 
+    
+        public synchronized Sprint szukajSprint(String dataSprint[], String dataKierownik) {
+        Factory factory = new Factory();
+        Osoba kierownik = szukajKierownika(dataKierownik);
+        if (kierownik != null) {
+            Projekt projekt = kierownik.getProjekt();
+            return projekt.findSprint(factory.createSprint(dataSprint));
+        } else {
+            return null;
+        }
+    }
+    
+    public synchronized int addSprint(String dataSprint[], String dataKierownik) {
+        int kodBledu = 0;
+        Osoba kierownik = szukajKierownika(dataKierownik);
+        if (kierownik != null) {
+            Factory factory = new Factory();
+            Projekt projekt = kierownik.getProjekt();
+            if (projekt != null) {
+                Sprint nowy = factory.createSprint(dataSprint);
+                kodBledu = projekt.addSprint(nowy);
+            } else {
+                kodBledu = 2;
+            }
+        } else {
+            kodBledu = 1;
+        }
+        return kodBledu;
+    }
+    
+     public synchronized int addStanSprintu(String dataStanSprintu[],String dataSprint[], String dataKierownik) {
+        int kodBledu = 0;
+        Osoba kierownik = szukajKierownika(dataKierownik);
+        if (kierownik != null) {
+            Factory factory = new Factory();
+            Projekt projekt = kierownik.getProjekt();
+            if (projekt != null) {
+                return projekt.addStanSprintu(factory.createSprint(dataSprint), factory.createStanSprintu(dataStanSprintu));
+            } else {
+                kodBledu = 2;
+            }
+        } else {
+            kodBledu = 1;
+        }
+        return kodBledu;
+    }
+    
+    public synchronized StanSprintu szukajStanSprintu(String dataStanSprintu[],String dataSprint[], String dataKierownik) {
+        StanSprintu stan = null;
+        Factory factory = new Factory();
+        Osoba kierownik = szukajKierownika(dataKierownik);
+        if (kierownik != null) {
+            Projekt projekt = kierownik.getProjekt();
+            if (projekt != null) {
+               stan = projekt.findStanSprintu(factory.createSprint(dataSprint), factory.createStanSprintu(dataStanSprintu));
+            }
+        }
+        return stan;
+    }
+    
+    
+    public Object[][] modelSprinty() {
+        ArrayList<Sprint> sprinty = new ArrayList<>();
+        for (Projekt projekt : projekty) {
+                sprinty.addAll(projekt.getSprinty());
+        }
+
+        Object matrix[][] = new Object[sprinty.size()][];
+        int i = 0;
+        for (Sprint sprint : sprinty) {
+            matrix[i++] = sprint.toStringArray();
+        }
+        return matrix;
+    }
+
+    public Object[][] modelSprinty(String project_kierownik) {
+        ArrayList<Sprint> sprinty = new ArrayList<>();
+        for (Projekt projekt : projekty) {
+            if (project_kierownik.equals(projekt.kierownikEmail())) {
+                sprinty.addAll(projekt.getSprinty());
+            }
+        }
+
+        Object matrix[][] = new Object[sprinty.size()][];
+        int i = 0;
+        for (Sprint sprint : sprinty) {
+            matrix[i++] = sprint.toStringArray();
+        }
+        return matrix;
+    }
+    
+    public Object[][] modelStanySprintu(String [] dataSprint, String mailKierownika) {
+        Osoba kierownik = szukajKierownika(mailKierownika);
+        if(kierownik!=null) {
+            Factory factory = new Factory();
+            Projekt projekt = this.searchProjekt(kierownik.getProjekt());
+            Sprint s = projekt.findSprint(factory.createSprint(dataSprint));
+            if(s != null) {
+                ArrayList<StanSprintu> stany = s.getStanySprintu();
+                Object matrix[][] = new Object[stany.size()][];
+                int i = 0;
+                for (StanSprintu stan : stany) {
+                    matrix[i++] = stan.toStringArray();
+                }
+                return matrix;
+            }
+        }
+        return null; 
+    }
+    
+    
     public static void main(String t[]) {
 
         Fasada fasada = new Fasada();

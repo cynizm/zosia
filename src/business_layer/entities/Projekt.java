@@ -2,6 +2,7 @@
 package business_layer.entities;
 
 
+import business_layer.Factory;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -15,7 +16,8 @@ public class Projekt {
     private ArrayList<Stan> stany = new ArrayList<>();
     private ArrayList<Osoba> zespol = new ArrayList<>();
     private List<Zadanie> zadania = new ArrayList<>();
-    
+    private ArrayList<Sprint> sprinty = new ArrayList<>();
+
     private String nazwa;
     private int status;
     private Klient klient;
@@ -228,6 +230,62 @@ public class Projekt {
             return "Dodano zadanie do projektu.";
         } else
             return "Zadanie znajduje się już na liście zadań projektu!";
+    }
+    
+        public Sprint findSprint(Sprint sprint) {
+	int index = this.sprinty.indexOf(sprint);
+	if (index != -1) {
+            return this.sprinty.get(index);
+	}
+	return null;
+    }
+
+  public int addSprint(Sprint sprint) {
+        Sprint s = findSprint(sprint);
+        if (s == null) {
+            this.sprinty.add(sprint);
+            return 0;
+        }
+        return 3;
+    }
+    
+    
+    public int addstanSprintu(String datastanSprint[], String dataSprint[])
+    {
+         Factory factory = new Factory();
+         Sprint sprint=factory.createSprint(dataSprint);
+            Sprint s = findSprint(sprint);
+            if (s != null) {
+               // Sprint sprint = szukajSprint(dataSprint,dataKierownik);
+                //StanSprintu stan = factory.createStanSprintu(dataStanSprintu);
+                return s.addStanSprintu(datastanSprint);
+            }
+        return 2;
+    }
+    
+    public StanSprintu szukajStanuSprintu(String datastanSprint[], String dataSprint[]) {
+        return null;
+    }
+    
+    public ArrayList <Sprint> getSprinty(){
+        return sprinty;
+    }
+
+
+    public int addStanSprintu(Sprint sprint_, StanSprintu stansprintu_) {
+            Sprint sprint = findSprint(sprint_);
+            if (sprint != null) {
+                return sprint.addStanSprintu(stansprintu_.toStringArray());
+            }
+            return 2;
+        }
+    public StanSprintu findStanSprintu(Sprint sprint_, StanSprintu stansprintu_) {
+        Sprint sprint = findSprint(sprint_);
+	int index = sprint.getStanySprintu().indexOf(stansprintu_);
+	if (index != -1) {
+            return sprint.getStanySprintu().get(index);
+	}
+	return null;
     }
 
 }
