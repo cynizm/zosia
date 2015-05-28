@@ -1,14 +1,14 @@
 package business_layer.entities;
 
+import java.io.Serializable;
 import java.util.Objects;
 
-public class Osoba {
+public class Osoba implements Serializable{
 
 	private Projekt projekt = null;
 	private String imie;
 	private String nazwisko;
 	private String email;
-	private Integer idProjektu;
 	private Rola rola;
 
 	public Osoba() {
@@ -42,14 +42,6 @@ public class Osoba {
 		this.email = email;
 	}
 
-	public Integer getIdProjektu() {
-		return idProjektu;
-	}
-
-	public void setIdProjektu(Integer idProjektu) {
-		this.idProjektu = idProjektu;
-	}
-
 	public Rola getRola() {
 		return rola;
 	}
@@ -65,9 +57,8 @@ public class Osoba {
         
         public boolean sprawdz_id_Kierownika(String dane)
         {
-            String idProj = getIdProjektu().toString();
             Rola rolaOsoby = getRola();
-            return (idProj.equals(dane) && rolaOsoby == Rola.KIEROWNIK_PROJEKTU);
+            return (rolaOsoby == Rola.KIEROWNIK_PROJEKTU);
         }
 
 
@@ -91,7 +82,6 @@ public class Osoba {
 		return "Imie: " + getImie()
 			+ " | Nazwisko: " + getNazwisko()
 			+ " | E-mail: " + getEmail()
-			+ " | IdProjektu: " + getIdProjektu().toString()
 			+ " | Rola: " + getRola().getText();
 	}
         

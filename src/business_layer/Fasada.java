@@ -5,17 +5,17 @@ import business_layer.entities.Osoba;
 import business_layer.entities.Projekt;
 import business_layer.entities.Rola;
 import business_layer.entities.Ryzyko;
-import business_layer.entities.Sprint;
-import business_layer.entities.StanSprintu;
-import business_layer.entities.StatusSprintu;
+import business_layer.entities.StatusZadania;
+import business_layer.entities.Zadanie;
 import java.util.ArrayList;
-
+import java.util.List;
 
 public class Fasada {
 
     private ArrayList<Klient> klienci = new ArrayList<>();
     private ArrayList<Osoba> osoby = new ArrayList<>();
     private ArrayList<Projekt> projekty = new ArrayList<>();
+    private final List<Zadanie> zadania = new ArrayList<>();
 
     public Fasada() {
         //tymczasowo dodajemy projekt
@@ -47,8 +47,7 @@ public class Fasada {
             dane_osoby[0] = next.getImie();
             dane_osoby[1] = next.getNazwisko();
             dane_osoby[2] = next.getEmail();
-            dane_osoby[3] = next.getIdProjektu().toString();
-            dane_osoby[4] = next.getRola().getText();
+            dane_osoby[3] = next.getRola().getText();
             tablica_osob[i++] = dane_osoby;
         }
         return tablica_osob;
@@ -58,16 +57,60 @@ public class Fasada {
         Object[][] tablica_projektow = new Object[projekty.size()][];
         int i = 0;
         for (Projekt next : projekty) {
-            String[] dane_projektu = new String[4];
-
+            String[] dane_projektu = new String[5];
             dane_projektu[0] = next.getNazwa();
             dane_projektu[1] = next.getKierownik().getEmail();
-            dane_projektu[2] = next.getData_rozpoczecia().toString();
-            dane_projektu[3] = next.getData_zakonczenia() == null ? "" : next.getData_zakonczenia().toString();
+            if(next.getKlient()!=null)
+                dane_projektu[2] = next.getKlient().getNip();
+            else
+                dane_projektu[2]="brak";
+            dane_projektu[3] = next.getData_rozpoczecia().toString();
+            dane_projektu[4] = next.getData_zakonczenia() == null ? "" : next.getData_zakonczenia().toString();
             tablica_projektow[i++] = dane_projektu;
             //projekt[i++] = next.toString_();
         }
         return tablica_projektow;
+    }
+    
+    public synchronized Object[][] modelTablicaZDanymiZadan(String kierownikProjektu) {
+        Projekt p = szukajProjektPoKierowniku(kierownikProjektu);
+        if (p != null) {
+            List<Zadanie> lista = p.getZadania();
+            Object[][] tablicaZadan = new Object[lista.size()][];
+            int i = 0;
+            for (Zadanie next : lista) {
+                String[] daneZadania = new String[7];
+                daneZadania[0] = Integer.toString(next.getIdentyfikator());
+                daneZadania[1] = next.getNazwa();
+                daneZadania[2] = next.getStatus().getText();
+                daneZadania[3] = Integer.toString(next.getSzacowanyCzas());
+                daneZadania[4] = Integer.toString(next.getCzasDoZakonczenia());
+                daneZadania[5] = Integer.toString(next.getCzasRealizacji());
+                daneZadania[6] = "Nie przydzielono";
+                tablicaZadan[i++] = daneZadania;
+            }
+            return tablicaZadan;
+        }
+        return new Object[0][0];
+    }
+    
+    public synchronized Object[][] modelTablicaZDanymiZespolu(String kierownikProjektu) {        
+        Projekt p = szukajProjektPoKierowniku(kierownikProjektu);
+        if (p != null) {
+            List<Osoba> lista = p.getZespol();
+            Object[][] tablicaOsob = new Object[lista.size()][];
+            int i = 0;
+            for (Osoba next : lista) {
+                String[] daneOsoby = new String[7];
+                daneOsoby[0] = next.getImie();
+                daneOsoby[1] = next.getNazwisko();
+                daneOsoby[2] = next.getEmail();
+                daneOsoby[3] = next.getRola().getText();
+                tablicaOsob[i++] = daneOsoby;
+            }
+            return tablicaOsob;
+        }
+        return new Object[0][0];
     }
 
     public synchronized Projekt searchProjekt(Projekt projekt) {
@@ -167,8 +210,16 @@ public class Fasada {
         }
         return null;
     }
+    
+    protected Osoba szukajOsobe(String email) {
+        int ile = osoby.size();
+        for(int i=0; i<ile; i++)
+            if(osoby.get(i).getEmail().equals(email))
+                return osoby.get(i);
+        return null;
+    }
 
-    public synchronized Osoba dodajOsobe(String data[]) {
+    public synchronized Object dodajOsobe(String data[]) {
         Factory factory = new Factory();
         Osoba nowa_osoba = factory.createOsoba(data);
         if (this.szukajOsobe(nowa_osoba) == null) {
@@ -176,6 +227,25 @@ public class Fasada {
             return nowa_osoba;
         }
         return null;
+    }
+    
+    public String dodajOsobeDoProjektu(String kierownikProjektu, String dodawanaOsoba) {
+        Projekt p = szukajProjektPoKierowniku(kierownikProjektu);
+        if (p == null)
+            return "Projekt nie istnieje!";
+        else {
+            try {
+                String[] osoba = {"0", dodawanaOsoba};
+                Factory fabryka = new Factory();
+                Osoba o = szukajOsobe(fabryka.createOsoba(osoba));
+                if (o != null)
+                    return p.dodajOsobe(o);
+                else
+                    return "Osoba nie istnieje w systemie!";
+            } catch (Exception e) {
+                return "Nie można przypisać osoby! " + e.getMessage();
+            }
+        }
     }
 
     private Osoba szukajKierownika(String email) {
@@ -205,13 +275,12 @@ public class Fasada {
         return nazwy_rol;
     }
     
-    public synchronized String[] modelStatusSprintu() {
-        StatusSprintu [] status = StatusSprintu.values();
-        String[] nazwy_statusow = new String[status.length];
-        for (int i = 0; i < status.length; i++) {
-            nazwy_statusow[i] = status[i].getText();
-        }
-        return nazwy_statusow;
+     public synchronized String[] modelStatusyZadan() {
+        StatusZadania[] statusy = StatusZadania.values();
+        String[] nazwyStatusow = new String[statusy.length];
+        for (int i = 0; i < statusy.length; i++) 
+            nazwyStatusow[i] = statusy[i].getText();
+        return nazwyStatusow;
     }
 
     public synchronized void wyswietlOsoby() {
@@ -232,6 +301,18 @@ public class Fasada {
             return modelKlienci();
         }
         return null;
+    }
+    
+    public synchronized int przypiszKlientaDoProjektu(String NIP, String kierownik) {
+        Factory fabryka = new Factory();
+        Klient klient = fabryka.createKlient(NIP);
+        Projekt projekt = fabryka.createProjekt(kierownik);
+        Projekt znaleziony = searchProjekt(projekt);
+        if( znaleziony!=null){
+             znaleziony.setKlient(klient);       
+             return 0;
+        }
+        return 1;
     }
 
     public synchronized String[] modelKlienci() {
@@ -286,7 +367,7 @@ public class Fasada {
     public Object[] pobierzTabliceProjektow() {
         ArrayList<String> tablica = new ArrayList<>();
         projekty.stream()
-                .forEach((projekt) -> tablica.add(projekt.getNazwa()));
+                .forEach((projekt) -> tablica.add(projekt.getKierownik().getEmail()));
         return tablica.toArray();
     }
 
@@ -298,115 +379,54 @@ public class Fasada {
         return tablica.toArray();
     }
     
-    public synchronized Sprint szukajSprint(String dataSprint[], String dataKierownik) {
-        Factory factory = new Factory();
-        Osoba kierownik = szukajKierownika(dataKierownik);
-        if (kierownik != null) {
-            Projekt projekt = kierownik.getProjekt();
-            return projekt.findSprint(factory.createSprint(dataSprint));
-        } else {
-            return null;
-        }
+     protected Zadanie szukajZadanie(String id) {
+        int ile = zadania.size();
+        for (int i=0; i<ile; i++)
+            if (String.valueOf(zadania.get(i).getIdentyfikator()).equals(id))
+                return zadania.get(i);
+        return null;
     }
-    
-    public synchronized int addSprint(String dataSprint[], String dataKierownik) {
-        int kodBledu = 0;
-        Osoba kierownik = szukajKierownika(dataKierownik);
-        if (kierownik != null) {
-            Factory factory = new Factory();
-            Projekt projekt = kierownik.getProjekt();
-            if (projekt != null) {
-                Sprint nowy = factory.createSprint(dataSprint);
-                kodBledu = projekt.addSprint(nowy);
-            } else {
-                kodBledu = 2;
-            }
-        } else {
-            kodBledu = 1;
-        }
-        return kodBledu;
-    }
-    
-     public synchronized int addStanSprintu(String dataStanSprintu[],String dataSprint[], String dataKierownik) {
-        int kodBledu = 0;
-        Osoba kierownik = szukajKierownika(dataKierownik);
-        if (kierownik != null) {
-            Factory factory = new Factory();
-            Projekt projekt = kierownik.getProjekt();
-            if (projekt != null) {
-                return projekt.addStanSprintu(factory.createSprint(dataSprint), factory.createStanSprintu(dataStanSprintu));
-            } else {
-                kodBledu = 2;
-            }
-        } else {
-            kodBledu = 1;
-        }
-        return kodBledu;
-    }
-    
-    public synchronized StanSprintu szukajStanSprintu(String dataStanSprintu[],String dataSprint[], String dataKierownik) {
-        StanSprintu stan = null;
-        Factory factory = new Factory();
-        Osoba kierownik = szukajKierownika(dataKierownik);
-        if (kierownik != null) {
-            Projekt projekt = kierownik.getProjekt();
-            if (projekt != null) {
-               stan = projekt.findStanSprintu(factory.createSprint(dataSprint), factory.createStanSprintu(dataStanSprintu));
+     
+     public String dodajZadanieDoProjektu(String kierownikProjektu, String[] zadanie) {
+        Projekt p = szukajProjektPoKierowniku(kierownikProjektu);
+        if (p == null)
+            return "Projekt nie istnieje!";
+        else {
+            try {
+                Factory fabryka = new Factory();
+                Zadanie z = fabryka.createZadanie(zadanie);
+                return p.dodajZadanie(z);
+            } catch (Exception e) {
+                return "Nie można utworzyć zadania! " + e.getMessage();
             }
         }
-        return stan;
+    }
+     
+     protected Projekt szukajProjektPoKierowniku(String kierownikProjektu) {
+        Factory fabryka = new Factory();
+        Osoba kierownik = szukajKierownika(kierownikProjektu);
+        String[] data = {"","0"};
+        Projekt temp = fabryka.createProjekt(data);
+        temp.setKierownik(kierownik);
+        return this.searchProjekt(temp);
     }
     
+     public Object[] pobierzTabliceKlientow() {
+        ArrayList<String> tablica = new ArrayList<>();
+        klienci.stream()
+                .forEach((klient) -> tablica.add(klient.getNip()));
+        return tablica.toArray();
+    }
     
-    public Object[][] modelSprinty() {
-        ArrayList<Sprint> sprinty = new ArrayList<>();
-        for (Projekt projekt : projekty) {
-                sprinty.addAll(projekt.getSprinty());
-        }
-
-        Object matrix[][] = new Object[sprinty.size()][];
-        int i = 0;
-        for (Sprint sprint : sprinty) {
-            matrix[i++] = sprint.toStringArray();
-        }
-        return matrix;
+    public Object[] pobierzDostepnychKierownikow() {
+        ArrayList<String> tablica = new ArrayList<>();
+        osoby.stream()
+                .filter((osoba) -> (osoba.getRola() == Rola.KIEROWNIK_PROJEKTU))
+                .filter((osoba) -> (osoba.getProjekt() == null))
+                .forEach((osoba) -> tablica.add(osoba.getEmail()));
+        return tablica.toArray();
     }
 
-    public Object[][] modelSprinty(String project_kierownik) {
-        ArrayList<Sprint> sprinty = new ArrayList<>();
-        for (Projekt projekt : projekty) {
-            if (project_kierownik.equals(projekt.kierownikEmail())) {
-                sprinty.addAll(projekt.getSprinty());
-            }
-        }
-
-        Object matrix[][] = new Object[sprinty.size()][];
-        int i = 0;
-        for (Sprint sprint : sprinty) {
-            matrix[i++] = sprint.toStringArray();
-        }
-        return matrix;
-    }
-    
-    public Object[][] modelStanySprintu(String [] dataSprint, String mailKierownika) {
-        Osoba kierownik = szukajKierownika(mailKierownika);
-        if(kierownik!=null) {
-            Factory factory = new Factory();
-            Projekt projekt = this.searchProjekt(kierownik.getProjekt());
-            Sprint s = projekt.findSprint(factory.createSprint(dataSprint));
-            if(s != null) {
-                ArrayList<StanSprintu> stany = s.getStanySprintu();
-                Object matrix[][] = new Object[stany.size()][];
-                int i = 0;
-                for (StanSprintu stan : stany) {
-                    matrix[i++] = stan.toStringArray();
-                }
-                return matrix;
-            }
-        }
-        return null; 
-    }
-    
     public static void main(String t[]) {
 
         Fasada fasada = new Fasada();
@@ -440,7 +460,6 @@ public class Fasada {
             "0", "Tester"};
         String t6[] = {"1", "Paweł", "Szpak", "pawel.szpak@pwr.edu.pl",
             "0", "Tester"};
-        
         fasada.dodajOsobe(t1);
         fasada.dodajOsobe(t2);
         fasada.dodajOsobe(t3);
@@ -489,36 +508,5 @@ public class Fasada {
         } else if (result == 1) {
             System.out.println("Wybrana osoba nie jest kierownikiem!");
         }
-                //....Testowanie Sprintu ......................................
-        System.out.println("Test sprintu");
-        String p1[] = {"Projekt","3"};
-        String p2[] = {"Projekt1","3"};
-        String sp1[] = {"1","Nierozpoczęty"};
-        String sp2[] = {"2","Nierozpoczęty"};
-        String sp3[] = {"3","Nierozpoczęty"};
-        String st1[] = {"1","1","1","2","2","2"};
-        String st2[] = {"2","1","1","2","2","2"};
-        String st3[] = {"3","1","1","2","2","2"};
-        
-        fasada.addProjekt(daneKierownika, p1);
-        fasada.addProjekt(daneKierownika, p2);
-        fasada.addSprint(sp1, daneKierownika);
-        fasada.addSprint(sp2, daneKierownika);
-        fasada.addSprint(sp3, daneKierownika);
-        fasada.addStanSprintu(st1, sp1, daneKierownika);
-        fasada.addStanSprintu(st2, sp2, daneKierownika);
-        fasada.addStanSprintu(st3, sp3, daneKierownika);
-        
-        Sprint res = fasada.szukajSprint(sp1, daneKierownika);
-        res.toStringArray();
-        System.out.println(res.toString());
-        res = fasada.szukajSprint(sp2, daneKierownika);
-        System.out.println(res.toString());
-        
-        StanSprintu rst = fasada.szukajStanSprintu(st1,sp1,daneKierownika);
-        System.out.println(rst.toString());
-        
-        rst = fasada.szukajStanSprintu(st2,sp2,daneKierownika);
-        System.out.println(rst.toString());
     }
 }
