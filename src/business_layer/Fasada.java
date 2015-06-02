@@ -43,17 +43,22 @@ public class Fasada {
     }
 
     public synchronized Object[][] modelTablicaZDanymiOsob() {
-        Object[][] tablica_osob = new Object[osoby.size()][];
+        Object[][] tablicaOsob = new Object[osoby.size()][];
         int i = 0;
         for (Osoba next : osoby) {
-            String[] dane_osoby = new String[5];
-            dane_osoby[0] = next.getImie();
-            dane_osoby[1] = next.getNazwisko();
-            dane_osoby[2] = next.getEmail();
-            dane_osoby[3] = next.getRola().getText();
-            tablica_osob[i++] = dane_osoby;
-        }
-        return tablica_osob;
+            String[] daneOsoby = new String[5];
+	    daneOsoby[0] = next.getImie();
+	    daneOsoby[1] = next.getNazwisko();
+	    daneOsoby[2] = next.getEmail();
+	    if (next.getProjekt() == null) {
+		daneOsoby[3] = "Nie przydzielono";
+	    } else {
+		daneOsoby[3] = next.getProjekt().getNazwa();
+	    }
+	    daneOsoby[4] = next.getRola().getText();
+	    tablicaOsob[i++] = daneOsoby;
+	}
+	return tablicaOsob;
     }
 
     public synchronized Object[][] modelProjekty() {
@@ -309,7 +314,7 @@ public class Fasada {
     public synchronized String[] dodajKlienta(String data[]) {
         Factory fabryka = new Factory();
         Klient klient = fabryka.createKlient(data);
-        if (szukajKlienta(klient) == false) {// jezeli nie ma takiego klienta
+        if (szukajKlienta(klient) == null) {
             klienci.add(klient);
             return modelKlienci();
         }
@@ -318,14 +323,18 @@ public class Fasada {
     
     public synchronized int przypiszKlientaDoProjektu(String NIP, String kierownik) {
         Factory fabryka = new Factory();
-        Klient klient = fabryka.createKlient(NIP);
-        Projekt projekt = fabryka.createProjekt(kierownik);
-        Projekt znaleziony = searchProjekt(projekt);
-        if( znaleziony!=null){
-             znaleziony.setKlient(klient);       
-             return 0;
-        }
-        return 1;
+        Klient klient = fabryka.createKlient(NIP), szuk_klient;
+        szuk_klient = this.szukajKlienta(klient);
+        if (klient != null) {
+	    Projekt projekt = fabryka.createProjekt(kierownik);
+	    Projekt znaleziony = searchProjekt(projekt);
+	    if (znaleziony != null) {
+		znaleziony.setKlient(klient);
+		return 0;
+	    }
+	}
+	return 1;
+
     }
 
     public synchronized String[] modelKlienci() {
@@ -344,9 +353,13 @@ public class Fasada {
         }
     }
 
-    public synchronized boolean szukajKlienta(Klient klient) {
+    public synchronized Klient szukajKlienta(Klient klient) {
         int k = klienci.indexOf(klient);
-        return (-1 != k);
+	if (-1 != k) {
+	    return klienci.get(k);
+	}
+	return null;
+
     }
 
     private void showRyzyka() {
