@@ -11,6 +11,7 @@ import business_layer.entities.StatusSprintu;
 import business_layer.entities.StatusZadania;
 import business_layer.entities.Zadanie;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Fasada {
@@ -18,7 +19,7 @@ public class Fasada {
     private ArrayList<Klient> klienci = new ArrayList<>();
     private ArrayList<Osoba> osoby = new ArrayList<>();
     private ArrayList<Projekt> projekty = new ArrayList<>();
-    private final List<Zadanie> zadania = new ArrayList<>();
+    private List<Zadanie> zadania = new ArrayList<>();
 
     public Fasada() {
         //tymczasowo dodajemy projekt
@@ -325,11 +326,11 @@ public class Fasada {
         Factory fabryka = new Factory();
         Klient klient = fabryka.createKlient(NIP), szuk_klient;
         szuk_klient = this.szukajKlienta(klient);
-        if (klient != null) {
+        if (szuk_klient != null) {
 	    Projekt projekt = fabryka.createProjekt(kierownik);
 	    Projekt znaleziony = searchProjekt(projekt);
 	    if (znaleziony != null) {
-		znaleziony.setKlient(klient);
+		znaleziony.setKlient(szuk_klient);
 		return 0;
 	    }
 	}
@@ -607,7 +608,7 @@ public class Fasada {
         fasada.dodajOsobe(t1); //jeszcze raz ta sama osoba
 
         System.out.println("====== struktura zawierajaca osoby ======");
-        System.out.println(fasada.modelOsoby().toString());
+        System.out.println(Arrays.toString(fasada.modelOsoby()));
         System.out.println("========== podglad tabeli osob ==========");
         fasada.wyswietlOsoby();
         System.out.println("=========== wyszukiwanie osob ===========");
