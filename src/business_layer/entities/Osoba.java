@@ -1,9 +1,8 @@
 package business_layer.entities;
 
-import java.io.Serializable;
 import java.util.Objects;
 
-public class Osoba implements Serializable{
+public class Osoba {
 
 	private Projekt projekt = null;
 	private String imie;
@@ -52,13 +51,13 @@ public class Osoba implements Serializable{
         
         public boolean sprawdz_email_Kierownika(String email)
         {
-            return (getEmail().equals(email) && getRola() == Rola.KIEROWNIK_PROJEKTU);
+            return getEmail().equals(email) && getRola() == Rola.KIEROWNIK_PROJEKTU;
         }
         
-        public boolean sprawdz_id_Kierownika(String dane)
+        public boolean sprawdz_id_Kierownika()
         {
             Rola rolaOsoby = getRola();
-            return (rolaOsoby == Rola.KIEROWNIK_PROJEKTU);
+            return rolaOsoby == Rola.KIEROWNIK_PROJEKTU;
         }
 
 

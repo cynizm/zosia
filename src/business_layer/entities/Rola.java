@@ -2,6 +2,7 @@
 package business_layer.entities;
 
 public enum Rola {
+    
     KIEROWNIK_PROJEKTU("Kierownik projektu"),
     ANALITYK("Analityk"),
     PROGRAMISTA("Programista"),

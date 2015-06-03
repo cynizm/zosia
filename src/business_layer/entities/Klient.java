@@ -1,6 +1,8 @@
 
 package business_layer.entities;
 
+import java.util.Objects;
+
 public class Klient {
     
     private String nazwaFirmy;
@@ -82,8 +84,22 @@ public class Klient {
     // sprawdzamy na podstawie nipu (unikatowa wartosc)
     @Override
     public boolean equals(Object obj) {    
-        return (getNip().equals(((Klient) obj).getNip()));
+        return getNip().equals(((Klient) obj).getNip());
     }
+    
+    
+	@Override
+	public int hashCode() {
+		int hash = 3;
+		hash = 53 * hash + Objects.hashCode(nazwaFirmy);
+		hash = 53 * hash + Objects.hashCode(ulica);
+		hash = 53 * hash + Objects.hashCode(nrDomu);
+		hash = 53 * hash + Objects.hashCode(nrLokalu);
+		hash = 53 * hash + Objects.hashCode(kodPocztowy);
+		hash = 53 * hash + Objects.hashCode(miejscowosc);
+		hash = 53 * hash + Objects.hashCode(nip);
+		return hash;
+	}
     
     @Override
     public String toString() {

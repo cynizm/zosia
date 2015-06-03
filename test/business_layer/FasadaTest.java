@@ -6,6 +6,7 @@ import business_layer.entities.Projekt;
 import business_layer.entities.Rola;
 import business_layer.entities.Ryzyko;
 import java.util.ArrayList;
+import java.util.List;
 import org.junit.After;
 import org.junit.AfterClass;
 import static org.junit.Assert.assertArrayEquals;
@@ -54,8 +55,8 @@ public class FasadaTest {
         return klient;
     }
 
-    public ArrayList<Klient> klienci() {
-        ArrayList<Klient> klienci = new ArrayList();
+    public List<Klient> klienci() {
+        List<Klient> klienci = new ArrayList<>();
         String dane_klienta1[] = {"firma1", "1545183328", "ulica1", "1a", "12", "miejscowosc1", "11-111"};
         String dane_klienta2[] = {"firma2", "8195536504", "ulica2", "2b", "21", "miejscowosc2", "22-222"};
         klienci.add(klient(dane_klienta1));
@@ -74,8 +75,8 @@ public class FasadaTest {
         return osoba;
     }
 
-    public ArrayList<Osoba> osoby() {
-        ArrayList<Osoba> osoby = new ArrayList();
+    public List<Osoba> osoby() {
+        List<Osoba> osoby = new ArrayList<>();
         String dane_osoba1[] = {"1", "imie1", "nazwisko1", "email1", "1", "Kierownik projektu"};
         String dane_osoba2[] = {"1", "imie2", "nazwisko2", "email2", "2", "Programista"};
         osoby.add(osoba(dane_osoba1));
@@ -94,8 +95,8 @@ public class FasadaTest {
         return projekt;
     }
 
-    public ArrayList<Projekt> projekty() {
-        ArrayList<Projekt> projekty = new ArrayList();
+    public List<Projekt> projekty() {
+        List<Projekt> projekty = new ArrayList<>();
         String dane_projekt1[] = {"Nazwa1", "1"};
         String dane_projekt2[] = {"Nazwa2", "2"};
         projekty.add(projekt(dane_projekt1));
@@ -124,11 +125,11 @@ public class FasadaTest {
      */
     @Test
     public void testGetListaKlientow() {
-        System.out.println("getListaKlientow");
+        System.err.println("getListaKlientow");
         Fasada instance = new Fasada();
-        ArrayList<Klient> expResult = klienci();
+        List<Klient> expResult = klienci();
         instance.setListaKlientow(expResult);
-        ArrayList<Klient> result = instance.getListaKlientow();
+        List<Klient> result = instance.getListaKlientow();
         assertEquals(expResult, result);
 
     }
@@ -138,8 +139,8 @@ public class FasadaTest {
      */
     @Test
     public void testSetListaKlientow() {
-        System.out.println("setListaKlientow");
-        ArrayList<Klient> klienci = klienci();
+        System.err.println("setListaKlientow");
+        List<Klient> klienci = klienci();
         Fasada instance = new Fasada();
         instance.setListaKlientow(klienci);
 
@@ -151,11 +152,11 @@ public class FasadaTest {
      */
     @Test
     public void testGetOsoby() {
-        System.out.println("modelOsoby");
+        System.err.println("modelOsoby");
         Fasada instance = new Fasada();
-        ArrayList<Osoba> expResult = osoby();
+        List<Osoba> expResult = osoby();
         instance.setOsoby(expResult);
-        ArrayList<Osoba> result = instance.getOsoby();
+        List<Osoba> result = instance.getOsoby();
         assertEquals(expResult, result);
     }
 
@@ -164,11 +165,11 @@ public class FasadaTest {
      */
     @Test
     public void testSetOsoby() {
-        System.out.println("setOsoby");
-        ArrayList<Osoba> osoby = osoby();
+        System.err.println("setOsoby");
+        List<Osoba> osoby = osoby();
         Fasada instance = new Fasada();
         instance.setOsoby(osoby);
-        ArrayList<Osoba> expResult = instance.getOsoby();
+        List<Osoba> expResult = instance.getOsoby();
         assertEquals(osoby, expResult);
     }
 
@@ -177,12 +178,12 @@ public class FasadaTest {
      */
     @Test
     public void testGetProjekty() {
-        System.out.println("getProjekty");
+        System.err.println("getProjekty");
         Fasada instance = new Fasada();
         
-        ArrayList<Projekt> expResult = projekty();
+        List<Projekt> expResult = projekty();
         instance.setProjekty(expResult);
-        ArrayList<Projekt> result = instance.getProjekty();
+        List<Projekt> result = instance.getProjekty();
         assertEquals(expResult, result);
     }
 
@@ -191,11 +192,11 @@ public class FasadaTest {
      */
     @Test
     public void testSetProjekty() {
-        System.out.println("setProjekty");
-        ArrayList<Projekt> projekty = projekty();
+        System.err.println("setProjekty");
+        List<Projekt> projekty = projekty();
         Fasada instance = new Fasada();
         instance.setProjekty(projekty);
-        ArrayList<Projekt> result = instance.getProjekty();
+        List<Projekt> result = instance.getProjekty();
         assertEquals(projekty, result);
     }
 
@@ -204,10 +205,10 @@ public class FasadaTest {
      */
     @Test
     public void testAddRisk() {
-        System.out.println("addRisk");
+        System.err.println("addRisk");
         String daneKierownika = "email1";
         String[] daneRyzyka = {"nazwa", "opis", "0.9", "1234"};
-        ArrayList<Osoba> osoby = osoby();
+        List<Osoba> osoby = osoby();
         String dane_projekt1[] = {"Nazwa1", "1"};
         
         Fasada instance = new Fasada();
@@ -225,10 +226,10 @@ public class FasadaTest {
      */
     @Test
     public void testModelRisks() {
-        System.out.println("getRisks");
+        System.err.println("getRisks");
         String daneKierownika = "email1";
         String[] daneRyzyka = {"nazwa", "opis", "0.9", "1234.0", (new Date()).toString(), "", "true"};
-        ArrayList<Osoba> osoby = osoby();
+        List<Osoba> osoby = osoby();
         String dane_projekt1[] = {"Nazwa1", "1"};
         
         Fasada instance = new Fasada();
@@ -249,8 +250,8 @@ public class FasadaTest {
      */
     @Test
     public void testSzukajOsobe_Osoba() {
-        System.out.println("szukajOsobe");
-        ArrayList<Osoba> osoby = osoby();
+        System.err.println("szukajOsobe");
+        List<Osoba> osoby = osoby();
         Fasada instance = new Fasada();
         instance.setOsoby(osoby);
         Osoba expResult = osoby.get(0);
@@ -263,9 +264,9 @@ public class FasadaTest {
      */
     @Test
     public void testSzukajOsobe_StringArr() {
-        System.out.println("szukajOsobe");
+        System.err.println("szukajOsobe");
         String[] data = {"0", "email1"};
-        ArrayList<Osoba> osoby = osoby();
+        List<Osoba> osoby = osoby();
         Fasada instance = new Fasada();
         instance.setOsoby(osoby);
         String expResult = osoby.get(0).toString();
@@ -278,7 +279,7 @@ public class FasadaTest {
      */
     @Test
     public void testDodajOsobe() {
-        System.out.println("dodajOsobe");
+        System.err.println("dodajOsobe");
         String dane_osoba1[] = {"1", "imie1", "nazwisko1", "email1", "1", "Tester"};
         String dane_osoba2[] = {"1", "imie2", "nazwisko2", "email2", "2", "Programista"};
         Fasada instance = new Fasada();
@@ -295,7 +296,7 @@ public class FasadaTest {
      */
     @Test
     public void testGetTablicaZDanymiOsob() {
-        System.out.println("modelTablicaZDanymiOsob");
+        System.err.println("modelTablicaZDanymiOsob");
         Fasada instance = new Fasada();
         instance.setOsoby(osoby());
         Object[][] expResult = new Object[instance.getOsoby().size()][];
@@ -312,7 +313,7 @@ public class FasadaTest {
      */
     @Test
     public void testGetRole() {
-        System.out.println("getRole");
+        System.err.println("getRole");
         Fasada instance = new Fasada();
         String[] expResult = {"Kierownik projektu", "Analityk", "Programista", "Tester"};
         String[] result = instance.modelRole();
@@ -324,7 +325,7 @@ public class FasadaTest {
      */
     @Test
     public void testDodajKlienta() {
-        System.out.println("dodajKlienta");
+        System.err.println("dodajKlienta");
         String[] data = {"firma1", "1545183328", "ulica1", "1a", "12", "miejscowosc1", "11-111"};
         Fasada instance = new Fasada();
         Klient expResult = klient(data);
@@ -338,7 +339,7 @@ public class FasadaTest {
      */
     @Test
     public void testSzukajKlienta() {
-        System.out.println("szukajKlienta");
+        System.err.println("szukajKlienta");
         Fasada instance = new Fasada();
         instance.setListaKlientow(klienci());
         // Klient expResult = instance.getListaKlientow().get(0);
@@ -351,7 +352,7 @@ public class FasadaTest {
      */
     @Test
     public void testPobierzTabliceKierownikow() {
-        System.out.println("pobierzTabliceKierownikow");
+        System.err.println("pobierzTabliceKierownikow");
         Fasada instance = new Fasada();
         instance.setOsoby(osoby());
         Object[] expResult = new Object[1];

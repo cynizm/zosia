@@ -99,9 +99,7 @@ public class Ryzyko {
             return false;
         }
 	if (Objects.equals(this.nazwa,((Ryzyko) obj).nazwa)) {
-            if (Objects.equals(this.opis, ((Ryzyko) obj).opis)) {
-        	return true;
-            }
+            return Objects.equals(this.opis, ((Ryzyko) obj).opis);
         }
 	return false;
     }

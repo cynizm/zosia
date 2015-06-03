@@ -11,12 +11,11 @@ import java.util.Map;
 
 public class Projekt {
 
-    
-    private ArrayList<Ryzyko> ryzyka = new ArrayList<>();
-    private ArrayList<Stan> stany = new ArrayList<>();
-    private ArrayList<Osoba> zespol = new ArrayList<>();
+    private List<Ryzyko> ryzyka = new ArrayList<>();
+    private List<Stan> stany = new ArrayList<>();
+    private List<Osoba> zespol = new ArrayList<>();
     private List<Zadanie> zadania = new ArrayList<>();
-    private ArrayList<Sprint> sprinty = new ArrayList<>();
+    private List<Sprint> sprinty = new ArrayList<>();
 
     private String nazwa;
     private int status;
@@ -103,13 +102,13 @@ public class Projekt {
     public void setData_zakonczenia(Date data){
         data_zakonczenia=data;
     }
-    public ArrayList<Osoba> getZespol(){
+    public List<Osoba> getZespol(){
         return zespol;
     }
     public void setZespol(Osoba osoba){
         zespol.add(osoba);
     }
-    public ArrayList<Stan> getStan() {
+    public List<Stan> getStan() {
         return stany;
     }
     public void setStan(Stan stan){
@@ -153,6 +152,12 @@ public class Projekt {
         }
 	return false;
     }
+    
+    	@Override
+	public int hashCode() {
+		int hash = 3;
+		return hash;
+	}
 	
     
     public String kierownikEmail(){
@@ -177,11 +182,11 @@ public class Projekt {
         return 3;
     }
         
-    public void setRyzyka(ArrayList<Ryzyko> ryzyka) {
+    public void setRyzyka(List<Ryzyko> ryzyka) {
         this.ryzyka = ryzyka;
     }
 
-    public ArrayList<Ryzyko> getRyzyka() {
+    public List<Ryzyko> getRyzyka() {
         return ryzyka;
     }
     
@@ -256,18 +261,12 @@ public class Projekt {
          Sprint sprint=factory.createSprint(dataSprint);
             Sprint s = findSprint(sprint);
             if (s != null) {
-               // Sprint sprint = szukajSprint(dataSprint,dataKierownik);
-                //StanSprintu stan = factory.createStanSprintu(dataStanSprintu);
                 return s.addStanSprintu(datastanSprint);
             }
         return 2;
     }
     
-    public StanSprintu szukajStanuSprintu(String datastanSprint[], String dataSprint[]) {
-        return null;
-    }
-    
-    public ArrayList <Sprint> getSprinty(){
+    public List <Sprint> getSprinty(){
         return sprinty;
     }
 

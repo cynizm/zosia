@@ -3,7 +3,9 @@ package business_layer.entities;
 
 import business_layer.Factory;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Date;
+import java.util.Objects;
 
 public class Sprint {
     
@@ -11,8 +13,7 @@ public class Sprint {
     private Date data_rozpoczecia;
     private Date data_zakonczenia;
     private StatusSprintu status_sprintu;
-    private ArrayList<Zadanie> zadania;
-    private ArrayList<StanSprintu> stany_sprintu;
+    private List<StanSprintu> stany_sprintu;
     
     
     public Sprint() {
@@ -20,8 +21,7 @@ public class Sprint {
         this.data_rozpoczecia = new Date();
         this.data_zakonczenia = new Date();
         this.status_sprintu = StatusSprintu.NIEROZPOCZETY;
-        this.zadania = new ArrayList <Zadanie> ();
-        this.stany_sprintu = new ArrayList <StanSprintu> ();
+        this.stany_sprintu = new ArrayList<StanSprintu> ();
     }
 
     public Integer getNumerSprintu() {
@@ -56,11 +56,11 @@ public class Sprint {
         this.status_sprintu = status_sprintu;
     }
 
-    public ArrayList<StanSprintu> getStanySprintu() {
+    public List<StanSprintu> getStanySprintu() {
         return stany_sprintu;
     }
 
-    public void setStanySprintu(ArrayList<StanSprintu> stany_sprintu) {
+    public void setStanySprintu(List<StanSprintu> stany_sprintu) {
         this.stany_sprintu = stany_sprintu;
     }
     
@@ -76,7 +76,6 @@ public class Sprint {
     public int addStanSprintu (String stansprintu[])
     {   Factory factory=new Factory();
         StanSprintu stan = factory.createStanSprintu(stansprintu);
-        //stan = findStanSprintu(stan);
         if (findStanSprintu(stan) == null) {
             stany_sprintu.add(stan);
             return 0;
@@ -92,6 +91,7 @@ public int addStanSprintu(StanSprintu stansprintu) {
         }
         return 2;
     }
+	@Override
      public String toString(){
          String str = "Nr. sprintu: " + this.numer_sprintu.toString() + " Data rozpoczęcia: "+ this.data_rozpoczecia.toString() +
                     " Data zakończenia: "+ this.data_zakonczenia+ " Status: "+ this.status_sprintu.toString();
@@ -107,14 +107,18 @@ public int addStanSprintu(StanSprintu stansprintu) {
         array[3] = status_sprintu.getText();
         return array;
     }
-     
+     	@Override
     public boolean equals(Object obj) {    
-        return (getNumerSprintu().equals(((Sprint)obj).getNumerSprintu()));
+        return getNumerSprintu().equals(((Sprint)obj).getNumerSprintu());
     }
-
+	@Override
+	public int hashCode() {
+		int hash = 3;
+		return hash;
+	}
     
    
-    public void toArrayList() {
+    public void toList() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

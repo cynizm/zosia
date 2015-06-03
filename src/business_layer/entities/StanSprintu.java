@@ -78,6 +78,7 @@ public class StanSprintu {
     public void setIloscZadanZakonczonych(Integer ilosc_zadan_zakonczonych) {
         this.ilosc_zadan_zakonczonych = ilosc_zadan_zakonczonych;
     }
+    @Override
     public String toString(){
         String str = "Data aktualizacji: " + this.data_aktualizacji.toString() + " numer dnia sprintu: "+ this.numer_dnia_sprintu.toString() +
                 " ilość zadań nierozpoczętych: "+ this.ilosc_zadan_nierozpoczetych.toString()+ " ilość zadań w analizie: "+ this.ilosc_zadan_w_analizie.toString()+ " ilość zadań w implementacji: "+
@@ -98,7 +99,15 @@ public class StanSprintu {
         array[6] = data_aktualizacji.toString();
         return array;
     }
-        public boolean equals(Object obj) {    
-        return (getNumerDniaSprintu().equals(((StanSprintu)obj).getNumerDniaSprintu()));
+    
+    @Override
+    public boolean equals(Object obj) {    
+        return getNumerDniaSprintu().equals(((StanSprintu)obj).getNumerDniaSprintu());
+    }
+        
+    @Override
+    public int hashCode() {
+	int hash = 3;
+	return hash;
     }
 }

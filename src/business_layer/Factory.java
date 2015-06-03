@@ -66,6 +66,8 @@ public Factory() {
                 nowa_osoba.setEmail(data[3]);
                 nowa_osoba.setRola(Rola.fromString(data[4]));
                 break;
+            default: 
+                break;
         }
         return nowa_osoba;
     }
