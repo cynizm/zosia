@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Date;
 import java.util.Objects;
 
-public class Sprint {
+public class Sprint extends Utility {
     
     private Integer numer_sprintu;
     private Date data_rozpoczecia;
@@ -59,6 +59,13 @@ public class Sprint {
     public List<StanSprintu> getStanySprintu() {
         return stany_sprintu;
     }
+    
+     public List<Utility> getStanySprintu_() {
+    List<Utility> table = new ArrayList();
+    table.addAll(stany_sprintu);
+    return table;
+    }
+
 
     public void setStanySprintu(List<StanSprintu> stany_sprintu) {
         this.stany_sprintu = stany_sprintu;
@@ -100,13 +107,13 @@ public int addStanSprintu(StanSprintu stansprintu) {
      
      public String[] toStringArray() {
         String[] array = new String[4];
-        
-        array[0] = numer_sprintu.toString();
-        array[1] = data_rozpoczecia.toString();
-        array[2] = data_zakonczenia.toString();
-        array[3] = status_sprintu.getText();
-        return array;
+	array[0] = numer_sprintu.toString();
+	array[1] = data_rozpoczecia.toString();
+	array[2] = data_zakonczenia.toString();
+	array[3] = status_sprintu.getText();
+	return array;
     }
+
      	@Override
     public boolean equals(Object obj) {    
         return getNumerSprintu().equals(((Sprint)obj).getNumerSprintu());

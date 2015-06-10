@@ -4,7 +4,7 @@ package business_layer.entities;
 import java.util.Date;
 import java.util.Objects;
 
-public class Ryzyko {
+public class Ryzyko extends Utility {
     private String nazwa;
     private String opis;
     private float prwdWystapienia;
@@ -119,14 +119,15 @@ public class Ryzyko {
     
     public String[] toStringArray() {
         String[] array = new String[7];
-        array[0] = this.getNazwa();
-        array[1] = this.getOpis();
-        array[2] = Float.toString(this.getPrwdWystapienia());
-        array[3] = Double.toString(this.getKosztWystapienia());
-        array[4] = this.getDataZgloszenia().toString();
-        array[5] = this.isAktywne() == true ? "" : this.getDataZgloszenia().toString();
-        array[6] = Boolean.toString(this.isAktywne());
-        return array;
+	array[0] = this.getNazwa();
+	array[1] = this.getOpis();
+	array[2] = Float.toString(this.getPrwdWystapienia());
+	array[3] = Double.toString(this.getKosztWystapienia());
+	array[4] = this.getDataZgloszenia().toString();
+	array[5] = this.isAktywne() == true ? "" : this.getDataZgloszenia().toString();
+	array[6] = Boolean.toString(this.isAktywne());
+	return array;
     }
+
     
 }

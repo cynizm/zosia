@@ -1,7 +1,7 @@
 
 package business_layer.entities;
 
-public class Zadanie {
+public class Zadanie extends Utility {
     
     private int identyfikator;
     private String nazwa;
@@ -99,18 +99,14 @@ public class Zadanie {
     }
     
     public String[] toStringArray() {
-        String temp = "nie przydzielono";
-        if (this.osoba != null)
-            temp = this.osoba.getEmail();
-        String[] array = new String[7];
-        array[0] = String.valueOf(this.getIdentyfikator());
-        array[1] = this.getNazwa();
-        array[2] = String.valueOf(this.getSzacowanyCzas());
-        array[3] = String.valueOf(this.getCzasDoZakonczenia());
-        array[4] = String.valueOf(this.getCzasRealizacji());
-        array[5] = temp;
-        array[6] = this.getStatus().getText();
-        return array;
+        String[] daneZadania = new String[7];
+	daneZadania[0] = Integer.toString(getIdentyfikator());
+	daneZadania[1] = getNazwa();
+	daneZadania[2] = getStatus().getText();
+	daneZadania[3] = Integer.toString(getSzacowanyCzas());
+	daneZadania[4] = Integer.toString(getCzasDoZakonczenia());
+	daneZadania[5] = Integer.toString(getCzasRealizacji());
+	daneZadania[6] = "Nie przydzielono";
+	return daneZadania;
     }
-
 }

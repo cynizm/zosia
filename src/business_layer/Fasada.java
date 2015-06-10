@@ -1,6 +1,7 @@
 package business_layer;
 
 import business_layer.entities.Klient;
+import business_layer.entities.Matrix;
 import business_layer.entities.Osoba;
 import business_layer.entities.Projekt;
 import business_layer.entities.Rola;
@@ -9,6 +10,7 @@ import business_layer.entities.Sprint;
 import business_layer.entities.StanSprintu;
 import business_layer.entities.StatusSprintu;
 import business_layer.entities.StatusZadania;
+import business_layer.entities.Utility;
 import business_layer.entities.Zadanie;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,89 +45,37 @@ public class Fasada {
     }
 
     public synchronized Object[][] modelTablicaZDanymiOsob() {
-        Object[][] tablicaOsob = new Object[osoby.size()][];
-        int i = 0;
-        for (Osoba next : osoby) {
-            String[] daneOsoby = new String[5];
-	    daneOsoby[0] = next.getImie();
-	    daneOsoby[1] = next.getNazwisko();
-	    daneOsoby[2] = next.getEmail();
-	    if (next.getProjekt() == null) {
-		daneOsoby[3] = "Nie przydzielono";
-	    } else {
-		daneOsoby[3] = next.getProjekt().getNazwa();
-	    }
-	    daneOsoby[4] = next.getRola().getText();
-	    tablicaOsob[i++] = daneOsoby;
-	}
-	return tablicaOsob;
+	List<Utility> listaosob = new ArrayList();
+	listaosob.addAll(osoby);
+	return Matrix.matrix(listaosob);
+
     }
 
     public synchronized Object[][] modelProjekty() {
-        Object[][] tablica_projektow = new Object[projekty.size()][];
-        int i = 0;
-        for (Projekt next : projekty) {
-            String[] dane_projektu = new String[5];
-            dane_projektu[0] = next.getNazwa();
-            dane_projektu[1] = next.getKierownik().getEmail();
-            if(next.getKlient()!=null)
-                dane_projektu[2] = next.getKlient().getNip();
-            else
-                dane_projektu[2]="brak";
-            dane_projektu[3] = next.getData_rozpoczecia().toString();
-            dane_projektu[4] = next.getData_zakonczenia() == null ? "" : next.getData_zakonczenia().toString();
-            tablica_projektow[i++] = dane_projektu;
-        }
-        return tablica_projektow;
+       	List<Utility> listaprojektow = new ArrayList();
+	listaprojektow.addAll(projekty);
+	return Matrix.matrix(listaprojektow);
+
     }
     
     public synchronized Object[][] modelTablicaZDanymiZadan(String kierownikProjektu) {
         Projekt p = szukajProjektPoKierowniku(kierownikProjektu);
-        if (p != null) {
-            List<Zadanie> lista = p.getZadania();
-            Object[][] tablicaZadan = new Object[lista.size()][];
-            int i = 0;
-            for (Zadanie next : lista) {
-                String[] daneZadania = new String[7];
-                daneZadania[0] = Integer.toString(next.getIdentyfikator());
-                daneZadania[1] = next.getNazwa();
-                daneZadania[2] = next.getStatus().getText();
-                daneZadania[3] = Integer.toString(next.getSzacowanyCzas());
-                daneZadania[4] = Integer.toString(next.getCzasDoZakonczenia());
-                daneZadania[5] = Integer.toString(next.getCzasRealizacji());
-                daneZadania[6] = "Nie przydzielono";
-                tablicaZadan[i++] = daneZadania;
-            }
-            return tablicaZadan;
-        }
-        return new Object[0][0];
+	if (p != null) {
+	    List<Utility> lista = p.getZadania_();
+	   return Matrix.matrix(lista);   
+	}
+	return new Object[0][0];
     }
+
     
     public synchronized Object[][] modelTablicaZDanymiZespolu(String kierownikProjektu) {        
         Projekt p = szukajProjektPoKierowniku(kierownikProjektu);
-        if (p != null) {
-            List<Osoba> lista = p.getZespol();
-            Object[][] tablicaOsob = new Object[lista.size()][];
-            int i = 0;
-            for (Osoba next : lista) {
-                String[] daneOsoby = new String[7];
-                daneOsoby[0] = next.getImie();
-                daneOsoby[1] = next.getNazwisko();
-                daneOsoby[2] = next.getEmail();
-                daneOsoby[3] = next.getRola().getText();
-                tablicaOsob[i++] = daneOsoby;
-            }
-            return tablicaOsob;
-        }
-        return new Object[0][0];
-    }
+	if (p != null) {
+	    List<Utility> lista = p.getZespol_();
+	    return Matrix.matrix(lista);
+	}
+	return new Object[0][0];
 
-    public synchronized Projekt searchProjekt(Projekt projekt) {
-        int idx = projekty.indexOf(projekt);
-        if (idx != -1) {
-            return projekty.get(idx);
-        }
-        return null;
     }
 
     public int addProjekt(String Dane_kierownika, String Dane_projektu[]) {
@@ -135,7 +85,7 @@ public class Fasada {
             Factory fabryka = new Factory();
             Projekt help1 = fabryka.createProjekt(Dane_projektu);
             help1.setKierownik(kierownik);
-            Projekt help2 = searchProjekt(help1);
+            Projekt help2 = Matrix.find(projekty, help1); 
             if (help2 == null) {
                 kierownik.setProjekt(help1);
                 projekty.add(help1);
@@ -172,35 +122,24 @@ public class Fasada {
     }
 
     public Object[][] modelRisks() {
-        List<Ryzyko> ryzyka = new ArrayList<>();
-        for (Projekt projekt : projekty) {
-            ryzyka.addAll(projekt.getRyzyka());
-        }
-
-        Object matrix[][] = new Object[ryzyka.size()][];
-        int i = 0;
-        for (Ryzyko ryzyko : ryzyka) {
-            matrix[i++] = ryzyko.toStringArray();
-        }
-        return matrix;
+        List<Utility> ryzyka = new ArrayList<>();
+	for (Projekt projekt : projekty) {
+	    ryzyka.addAll(projekt.getRyzyka());
+	}
+	 return Matrix.matrix(ryzyka);
     }
+
 
     public Object[][] modelRisks(String project_kierownik) {
-        List<Ryzyko> ryzyka = new ArrayList<>();
-        for (Projekt projekt : projekty) {
-            if (project_kierownik.equals(projekt.kierownikEmail())) {
-                ryzyka.addAll(projekt.getRyzyka());
-            }
-        }
-
-        Object matrix[][] = new Object[ryzyka.size()][];
-        int i = 0;
-        for (Ryzyko ryzyko : ryzyka) {
-            matrix[i++] = ryzyko.toStringArray();
-        }
-        return matrix;
+        List<Utility> ryzyka = new ArrayList<>();
+	for (Projekt projekt : projekty) {
+	    if (project_kierownik.equals(projekt.kierownikEmail())) {
+		ryzyka.addAll(projekt.getRyzyka());
+	    }
+	}
+	return Matrix.matrix(ryzyka);
     }
-    
+
     public synchronized String[] modelStatusSprintu() {
         StatusSprintu [] status = StatusSprintu.values();
         String[] nazwy_statusow = new String[status.length];
@@ -209,42 +148,26 @@ public class Fasada {
         }
         return nazwy_statusow;
     }
-        
-    
-    public synchronized Osoba szukajOsobe(Osoba osoba) {
-        int idx = osoby.indexOf(osoba);
-        if (idx != -1) {
-            return osoby.get(idx);
-        }
-        return null;
-    }
 
     public synchronized String szukajOsobe(String data[]) {
         Factory factory = new Factory();
-        Osoba znaleziona_osoba = szukajOsobe(factory.createOsoba(data));
+        Osoba znaleziona_osoba = Matrix.find(osoby, factory.createOsoba(data));
         if (znaleziona_osoba != null) {
             return znaleziona_osoba.toString();
         }
         return null;
     }
-    
-    protected Osoba szukajOsobe(String email) {
-        int ile = osoby.size();
-        for(int i=0; i<ile; i++)
-            if(osoby.get(i).getEmail().equals(email))
-                return osoby.get(i);
-        return null;
+
+    public synchronized String dodajOsobe(String data[]) {
+	Factory factory = new Factory();
+	Osoba nowa_osoba = factory.createOsoba(data);
+	if (Matrix.find(osoby, nowa_osoba) == null) {
+	    osoby.add(nowa_osoba);
+	    return "";
+	}
+	return null;
     }
 
-    public synchronized Object dodajOsobe(String data[]) {
-        Factory factory = new Factory();
-        Osoba nowa_osoba = factory.createOsoba(data);
-        if (this.szukajOsobe(nowa_osoba) == null) {
-            osoby.add(nowa_osoba);
-            return nowa_osoba;
-        }
-        return null;
-    }
     
     public String dodajOsobeDoProjektu(String kierownikProjektu, String dodawanaOsoba) {
         Projekt p = szukajProjektPoKierowniku(kierownikProjektu);
@@ -254,7 +177,7 @@ public class Fasada {
             try {
                 String[] osoba = {"0", dodawanaOsoba};
                 Factory fabryka = new Factory();
-                Osoba o = szukajOsobe(fabryka.createOsoba(osoba));
+                Osoba o = Matrix.find(osoby,fabryka.createOsoba(osoba));
                 if (o != null)
                     return p.dodajOsobe(o);
                 else
@@ -282,6 +205,12 @@ public class Fasada {
         }
         return null;
     }
+    
+      protected Zadanie szukajZadanie(String id) {
+	Zadanie zadanie = new Zadanie();
+	zadanie.setIdentyfikator(Integer.parseInt(id));
+	return Matrix.find(zadania, zadanie);
+    }
 
     public synchronized String[] modelRole() {
         Rola[] role = Rola.values();
@@ -303,7 +232,7 @@ public class Fasada {
     public synchronized String[] dodajKlienta(String data[]) {
         Factory fabryka = new Factory();
         Klient klient = fabryka.createKlient(data);
-        if (szukajKlienta(klient) == null) {
+        if (Matrix.find(klienci, klient) == null) {
             klienci.add(klient);
             return modelKlienci();
         }
@@ -313,10 +242,10 @@ public class Fasada {
     public synchronized int przypiszKlientaDoProjektu(String NIP, String kierownik) {
         Factory fabryka = new Factory();
         Klient klient = fabryka.createKlient(NIP), szuk_klient;
-        szuk_klient = this.szukajKlienta(klient);
+        szuk_klient = Matrix.find(klienci, klient);
         if (szuk_klient != null) {
 	    Projekt projekt = fabryka.createProjekt(kierownik);
-	    Projekt znaleziony = searchProjekt(projekt);
+            Projekt znaleziony = Matrix.find(projekty, projekt);
 	    if (znaleziony != null) {
 		znaleziony.setKlient(szuk_klient);
 		return 0;
@@ -333,15 +262,6 @@ public class Fasada {
             tablica[i] = klienci.get(i).toString();
         }
         return tablica;
-    }
-
-    public synchronized Klient szukajKlienta(Klient klient) {
-        int k = klienci.indexOf(klient);
-	if (-1 != k) {
-	    return klienci.get(k);
-	}
-	return null;
-
     }
 
     public List<Klient> getKlienci() {
@@ -378,14 +298,6 @@ public class Fasada {
                 .forEach(osoba -> tablica.add(osoba.getEmail()));
         return tablica.toArray();
     }
-    
-     protected Zadanie szukajZadanie(String id) {
-        int ile = zadania.size();
-        for (int i=0; i<ile; i++)
-            if (String.valueOf(zadania.get(i).getIdentyfikator()).equals(id))
-                return zadania.get(i);
-        return null;
-    }
      
      public String dodajZadanieDoProjektu(String kierownikProjektu, String[] zadanie) {
         Projekt p = szukajProjektPoKierowniku(kierownikProjektu);
@@ -408,7 +320,7 @@ public class Fasada {
         String[] data = {"","0"};
         Projekt temp = fabryka.createProjekt(data);
         temp.setKierownik(kierownik);
-        return this.searchProjekt(temp);
+        return Matrix.find(projekty, temp);
     }
     
      public Object[] pobierzTabliceKlientow() {
@@ -425,18 +337,6 @@ public class Fasada {
                 .filter(osoba -> osoba.getProjekt() == null)
                 .forEach(osoba -> tablica.add(osoba.getEmail()));
         return tablica.toArray();
-    }
-
-    
-        public synchronized Sprint szukajSprint(String dataSprint[], String dataKierownik) {
-        Factory factory = new Factory();
-        Osoba kierownik = szukajKierownika(dataKierownik);
-        if (kierownik != null) {
-            Projekt projekt = kierownik.getProjekt();
-            return projekt.findSprint(factory.createSprint(dataSprint));
-        } else {
-            return null;
-        }
     }
     
     public synchronized int addSprint(String dataSprint[], String dataKierownik) {
@@ -474,68 +374,40 @@ public class Fasada {
         return kodBledu;
     }
     
-    public synchronized StanSprintu szukajStanSprintu(String dataStanSprintu[],String dataSprint[], String dataKierownik) {
-        StanSprintu stan = null;
-        Factory factory = new Factory();
-        Osoba kierownik = szukajKierownika(dataKierownik);
-        if (kierownik != null) {
-            Projekt projekt = kierownik.getProjekt();
-            if (projekt != null) {
-               stan = projekt.findStanSprintu(factory.createSprint(dataSprint), factory.createStanSprintu(dataStanSprintu));
-            }
-        }
-        return stan;
+    public synchronized Object[][] modelSprinty() {
+	List<Utility> sprinty = new ArrayList<>();
+	for (Projekt projekt : projekty) {
+	    sprinty.addAll(projekt.getSprinty());
+	}
+	return Matrix.matrix(sprinty);
     }
-    
-    
-    public Object[][] modelSprinty() {
-        List<Sprint> sprinty = new ArrayList<>();
-        for (Projekt projekt : projekty) {
-                sprinty.addAll(projekt.getSprinty());
-        }
 
-        Object matrix[][] = new Object[sprinty.size()][];
-        int i = 0;
-        for (Sprint sprint : sprinty) {
-            matrix[i++] = sprint.toStringArray();
-        }
-        return matrix;
-    }
 
     public Object[][] modelSprinty(String project_kierownik) {
-        List<Sprint> sprinty = new ArrayList<>();
-        for (Projekt projekt : projekty) {
-            if (project_kierownik.equals(projekt.kierownikEmail())) {
-                sprinty.addAll(projekt.getSprinty());
-            }
-        }
-
-        Object matrix[][] = new Object[sprinty.size()][];
-        int i = 0;
-        for (Sprint sprint : sprinty) {
-            matrix[i++] = sprint.toStringArray();
-        }
-        return matrix;
+        List<Utility> sprinty = new ArrayList<>();
+	for (Projekt projekt : projekty) {
+	    if (project_kierownik.equals(projekt.kierownikEmail())) {
+		sprinty.addAll(projekt.getSprinty());
+	    }
+	}
+     return Matrix.matrix(sprinty);
     }
+
     
     public Object[][] modelStanySprintu(String [] dataSprint, String mailKierownika) {
         Osoba kierownik = szukajKierownika(mailKierownika);
         if(kierownik!=null) {
             Factory factory = new Factory();
-            Projekt projekt = this.searchProjekt(kierownik.getProjekt());
+            Projekt projekt = Matrix.find(projekty, kierownik.getProjekt());
             Sprint s = projekt.findSprint(factory.createSprint(dataSprint));
             if(s != null) {
-                List<StanSprintu> stany = s.getStanySprintu();
-                Object matrix[][] = new Object[stany.size()][];
-                int i = 0;
-                for (StanSprintu stan : stany) {
-                    matrix[i++] = stan.toStringArray();
-                }
-                return matrix;
-            }
-        }
-        return new Object[0][0]; 
+                List<Utility> stany = s.getStanySprintu_();
+		return Matrix.matrix(stany);
+	    }
+	}
+	return new Object[0][0];
     }
+
     
     
     public static void main(String t[]) {

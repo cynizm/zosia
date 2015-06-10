@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Projekt {
+public class Projekt extends Utility {
 
     private List<Ryzyko> ryzyka = new ArrayList<>();
     private List<Stan> stany = new ArrayList<>();
@@ -105,6 +105,13 @@ public class Projekt {
     public List<Osoba> getZespol(){
         return zespol;
     }
+    
+    public List<Utility> getZespol_() {
+    List<Utility> table = new ArrayList();
+    table.addAll(zespol);
+    return table;
+    }
+
     public void setZespol(Osoba osoba){
         zespol.add(osoba);
     }
@@ -118,6 +125,13 @@ public class Projekt {
     public List<Zadanie> getZadania() {
         return zadania;
     }
+    
+    public List<Utility> getZadania_() {
+    List<Utility> table = new ArrayList();
+    table.addAll(zadania);
+    return table;
+    }
+
 
     public void setZadania(List<Zadanie> zadania) {
         this.zadania = zadania;
@@ -278,13 +292,22 @@ public class Projekt {
             }
             return 2;
         }
-    public StanSprintu findStanSprintu(Sprint sprint_, StanSprintu stansprintu_) {
-        Sprint sprint = findSprint(sprint_);
-	int index = sprint.getStanySprintu().indexOf(stansprintu_);
-	if (index != -1) {
-            return sprint.getStanySprintu().get(index);
+    
+    public String[] toStringArray() {
+	String[] dane_projektu = new String[5];
+	dane_projektu[0] = getNazwa();
+	dane_projektu[1] = getKierownik().getEmail();
+	if (getKlient() != null) {
+	    dane_projektu[2] = getKlient().getNip();
+	} else {
+	    dane_projektu[2] = "brak";
 	}
-	return null;
+	dane_projektu[3] = getData_rozpoczecia().toString();
+	dane_projektu[4] = getData_zakonczenia() == null ? "" :
+getData_zakonczenia().toString();
+
+	return dane_projektu;
     }
+
 
 }

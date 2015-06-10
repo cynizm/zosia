@@ -2,7 +2,7 @@ package business_layer.entities;
 
 import java.util.Objects;
 
-public class Osoba {
+public class Osoba extends Utility {
 
 	private Projekt projekt = null;
 	private String imie;
@@ -85,12 +85,19 @@ public class Osoba {
 	}
         
         public String[] toStringArray() {
-            String[] array = new String[3];
-            array[0] = this.getImie();
-            array[1] = this.getNazwisko();
-            array[2] = this.getEmail();
-            return array;
-	}
+            String[] daneOsoby = new String[5];
+            daneOsoby[0] = getImie();
+            daneOsoby[1] = getNazwisko();
+            daneOsoby[2] = getEmail();
+            if (getProjekt() == null) {
+                daneOsoby[3] = "Nie przydzielono";
+            } else {
+                daneOsoby[3] = getProjekt().getNazwa();
+            }
+            daneOsoby[4] = getRola().getText();
+            return daneOsoby;
+    }
+
 
 	public Projekt getProjekt() {
 		return projekt;

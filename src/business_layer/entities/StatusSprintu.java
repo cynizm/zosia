@@ -1,7 +1,7 @@
 
 package business_layer.entities;
 
-public enum StatusSprintu{
+public enum StatusSprintu {
     NIEROZPOCZETY("Nierozpoczęty"),
     W_TRAKCIE("W trakcie"),
     ZAKONCZONY("Zakończony");

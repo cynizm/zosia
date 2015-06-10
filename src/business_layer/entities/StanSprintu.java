@@ -3,7 +3,7 @@ package business_layer.entities;
 
 import java.util.Date;
 
-public class StanSprintu {
+public class StanSprintu extends Utility {
         
     private Date data_aktualizacji;
     private Integer numer_dnia_sprintu;
@@ -88,17 +88,16 @@ public class StanSprintu {
     
     public String[] toStringArray() {
         String[] array = new String[7];
-        
-
-        array[0] = numer_dnia_sprintu.toString();
-        array[1] = ilosc_zadan_nierozpoczetych.toString();
-        array[2] = ilosc_zadan_w_analizie.toString();
-        array[3] = ilosc_zadan_w_implementacji.toString();
-        array[4] = ilosc_zadan_w_testach.toString();
-        array[5] = ilosc_zadan_zakonczonych.toString();
-        array[6] = data_aktualizacji.toString();
-        return array;
+	array[0] = numer_dnia_sprintu.toString();
+	array[1] = ilosc_zadan_nierozpoczetych.toString();
+	array[2] = ilosc_zadan_w_analizie.toString();
+	array[3] = ilosc_zadan_w_implementacji.toString();
+	array[4] = ilosc_zadan_w_testach.toString();
+	array[5] = ilosc_zadan_zakonczonych.toString();
+	array[6] = data_aktualizacji.toString();
+	return array;
     }
+
     
     @Override
     public boolean equals(Object obj) {    
