@@ -7,7 +7,6 @@ import business_layer.entities.Projekt;
 import business_layer.entities.Rola;
 import business_layer.entities.Ryzyko;
 import business_layer.entities.Sprint;
-import business_layer.entities.StanSprintu;
 import business_layer.entities.StatusSprintu;
 import business_layer.entities.StatusZadania;
 import business_layer.entities.Utility;
@@ -183,7 +182,7 @@ public class Fasada {
                 else
                     return "Osoba nie istnieje w systemie!";
             } catch (Exception e) {
-                throw new RuntimeException("Nie można przypisać osoby! " + e.getMessage());
+                throw new RuntimeException(e);
             }
         }
     }
@@ -197,7 +196,7 @@ public class Fasada {
         return null;
     }
 
-    public String sprawdzKierownika(String dane) {
+    public String sprawdzKierownika() {
         for (Osoba osoba : osoby) {
             if (osoba.sprawdz_id_Kierownika()) {
                 return osoba.toString();
@@ -309,7 +308,7 @@ public class Fasada {
                 Zadanie z = fabryka.createZadanie(zadanie);
                 return p.dodajZadanie(z);
             } catch (Exception e) {
-                throw new RuntimeException("Nie można utworzyć zadania! " + e.getMessage());
+                throw new RuntimeException(e);
             }
         }
     }
